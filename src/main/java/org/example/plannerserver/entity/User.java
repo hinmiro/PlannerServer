@@ -1,13 +1,14 @@
 package org.example.plannerserver.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Builder;
+import lombok.Data;
 
 @Entity
 @Table(name = "app_user")
-@Getter
-@Setter
+@Data
+@Builder
 public class User {
 
     @Id
@@ -24,12 +25,24 @@ public class User {
     @JoinColumn(name="appdata_id", referencedColumnName = "data_id")
     private ApplicationData applicationData;
 
-    public User(String username, String password, String email, ApplicationData applicationData) {
+    public User(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
+
+    public User() {}
+
+    public User(Long userId, String username, String password, String email, ApplicationData applicationData) {
+        this.userId = userId;
         this.username = username;
         this.password = password;
         this.email = email;
         this.applicationData = applicationData;
     }
 
-    public User() {}
+    @JsonProperty("applicationData")
+    public Long getApplicationDataId() {
+        return applicationData != null ? applicationData.getData_id() : null;
+    }
 }

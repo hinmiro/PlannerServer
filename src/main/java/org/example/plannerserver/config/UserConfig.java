@@ -12,11 +12,14 @@ import java.util.List;
 @Configuration
 public class UserConfig {
 
+//    DUMMY DATA FOR DATABASE
     @Bean
     CommandLineRunner userCommandLineRunner(UserRepository repository) {
         return args -> {
-            User tester = new User("Tester1", "test", "asd@ads.fi", new ApplicationData());
-            User admin = new User("ADMINM", "root", "admin@planner.com", new ApplicationData());
+            User tester = new User("Tester1", "test", "asd@ads.fi");
+            User admin = new User("ADMINM", "root", "admin@planner.com");
+            tester.setApplicationData(new ApplicationData());
+            admin.setApplicationData(new ApplicationData());
 
             repository.saveAll(List.of(tester, admin));
         };

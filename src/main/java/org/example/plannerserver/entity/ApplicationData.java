@@ -13,13 +13,4 @@ public class ApplicationData {
     @SequenceGenerator(name="app_sequence", sequenceName="app_sequence", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "app_sequence")
     private Long data_id;
-
-    @OneToOne(mappedBy = "applicationData")
-    private User user;
-
-    public ApplicationData() {}
-
-    public ApplicationData(User user) {
-        this.user = user;
-    }
 }
