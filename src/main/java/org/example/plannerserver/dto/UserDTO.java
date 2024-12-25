@@ -23,10 +23,12 @@ public class UserDTO {
         this.applicationData = applicationData;
     }
 
-    @JsonProperty("applicationData")
-    public Long getApplicationData() {
-        return applicationData != null ? applicationData.getData_id() : null;
+    public UserDTO(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
     }
 
 
+    public UserDTO() {}
 }

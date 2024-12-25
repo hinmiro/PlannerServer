@@ -1,8 +1,7 @@
 package org.example.plannerserver.config;
 
-import org.example.plannerserver.entity.ApplicationData;
-import org.example.plannerserver.entity.User;
-import org.example.plannerserver.repository.UserRepository;
+import org.example.plannerserver.dto.UserDTO;
+import org.example.plannerserver.service.AuthenticationService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,14 +13,10 @@ public class UserConfig {
 
 //    DUMMY DATA FOR DATABASE
     @Bean
-    CommandLineRunner userCommandLineRunner(UserRepository repository) {
+    CommandLineRunner userCommandLineRunner(AuthenticationService service) {
         return args -> {
-            User tester = new User("Tester1", "test", "asd@ads.fi");
-            User admin = new User("ADMINM", "root", "admin@planner.com");
-            tester.setApplicationData(new ApplicationData());
-            admin.setApplicationData(new ApplicationData());
-
-            repository.saveAll(List.of(tester, admin));
+            service.registerUser(new UserDTO("Tester1", "test", "asd@ads.fi"));
+            service.registerUser(new UserDTO("ADMIN", "root", "admin@planner.com"));
         };
     }
 }

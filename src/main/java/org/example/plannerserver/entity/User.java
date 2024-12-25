@@ -4,12 +4,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "app_user")
 @Data
 @Builder
-public class User {
+public class User implements UserDetails {
 
     @Id
  //   @GeneratedValue(strategy = GenerationType.IDENTITY) CAN ALSO BE USED
@@ -41,8 +46,28 @@ public class User {
         this.applicationData = applicationData;
     }
 
-    @JsonProperty("applicationData")
-    public Long getApplicationDataId() {
-        return applicationData != null ? applicationData.getData_id() : null;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return UserDetails.super.isAccountNonLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return UserDetails.super.isEnabled();
     }
 }
