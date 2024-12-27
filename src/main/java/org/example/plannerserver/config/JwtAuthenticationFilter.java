@@ -8,10 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.plannerserver.entity.User;
 import org.example.plannerserver.repository.UserRepository;
 import org.example.plannerserver.service.JwtService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -21,15 +21,20 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
+    private final UserRepository userRepository;
 
-    @Autowired
-    UserRepository userRepository;
+    public JwtAuthenticationFilter(JwtService jwtService, UserRepository userRepository) {
+        this.jwtService = jwtService;
+        this.userRepository = userRepository;
+    }
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        final String authenticationHeader = request.getHeader("Authorization");
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+
+        String authenticationHeader = request.getHeader("Authorization");
 
         if (authenticationHeader == null || !authenticationHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -37,23 +42,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String jwt = authenticationHeader.split(" ")[1];
-        log.info("JWT: {}", jwt);
-
-        String username = null;
+        String username;
         try {
             username = jwtService.extractUsername(jwt);
         } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Bad jwt token!");
+            log.info("Corrupted jwt token found");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Corrupted JWT token");
             return;
         }
 
-        User user = userRepository.findByUsername(username).get();
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            User user = userRepository.findByUsername(username).orElseThrow();
+            if (jwtService.isValid(jwt, user)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
 
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, null, user.getAuthorities());
-
-        SecurityContextHolder.getContext().setAuthentication(authToken);
-
+        }
         filterChain.doFilter(request, response);
-
     }
 }

@@ -2,13 +2,13 @@ package org.example.plannerserver.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.plannerserver.dto.LoginDTO;
-import org.example.plannerserver.dto.RegisterDTO;
 import org.example.plannerserver.dto.UserDTO;
 import org.example.plannerserver.entity.ApplicationData;
 import org.example.plannerserver.entity.User;
 import org.example.plannerserver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,13 +33,21 @@ public class AuthenticationService {
     }
 
     public UserDTO login(LoginDTO loginDTO) {
+
         Optional<User> userOptional = userRepository.findByUsername(loginDTO.getUsername());
         if (userOptional.isEmpty()) {
             return null;
         }
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword());
+        authenticationManager.authenticate(token);
+
         User user = userOptional.get();
+
         if (encoder.matches(loginDTO.getPassword(), user.getPassword())) {
-            return userService.convertToDTO(user);
+            UserDTO userDTO = userService.convertToDTO(user);
+            String jwtToken = jwtService.generateToken(userDTO);
+            userDTO.setJwt(jwtToken);
+            return userDTO;
         } else {
             return null;
         }
@@ -50,7 +58,9 @@ public class AuthenticationService {
             user.setPassword(encoder.encode(user.getPassword()));
             user.setApplicationData(new ApplicationData());
             User entityUser = userRepository.save(userService.convertToEntity(user));
-            return userService.convertToDTO(entityUser);
+            UserDTO userDTO =  userService.convertToDTO(entityUser);
+            userDTO.setJwt(jwtService.generateToken(userDTO));
+            return userDTO;
         } else {
             return null;
         }

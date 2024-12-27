@@ -1,7 +1,6 @@
 package org.example.plannerserver.service;
 
 import org.example.plannerserver.dto.UserDTO;
-import org.example.plannerserver.entity.ApplicationData;
 import org.example.plannerserver.entity.User;
 import org.example.plannerserver.repository.ApplicationDataRepository;
 import org.example.plannerserver.repository.UserRepository;
@@ -30,17 +29,6 @@ public class UserService {
         List<User> users = userRepository.findAll();
         return users.stream().map(user -> convertToDTO(user)).collect(Collectors.toList());
     }
-
-//    public UserDTO registerUser(UserDTO user) {
-//        if (userRepository.findByUsername(user.getUsername()).isEmpty()) {
-//            user.setPassword(encoder.encode(user.getPassword()));
-//            user.setApplicationData(new ApplicationData());
-//            User entityUser = userRepository.save(convertToEntity(user));
-//            return convertToDTO(entityUser);
-//        } else {
-//            return null;
-//        }
-//    }
 
     public UserDTO convertToDTO(User user) {
         return UserDTO.builder()

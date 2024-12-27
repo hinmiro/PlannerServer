@@ -1,7 +1,6 @@
 package org.example.plannerserver.controller;
 
 import org.example.plannerserver.dto.LoginDTO;
-import org.example.plannerserver.dto.RegisterDTO;
 import org.example.plannerserver.dto.UserDTO;
 import org.example.plannerserver.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/auth")
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
@@ -24,16 +23,16 @@ public class AuthenticationController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<Object> userLogin(@RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<UserDTO> userLogin(@RequestBody LoginDTO loginDTO) {
 
         if (loginDTO.getUsername() == null || loginDTO.getPassword() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing username or password");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         UserDTO loggedUser = authenticationService.login(loginDTO);
-        if (loggedUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect username or password");
+        if (loggedUser != null) {
+            return ResponseEntity.status(200).body(loggedUser);
         }
-        return ResponseEntity.status(200).body(loggedUser);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @PostMapping("/register")
