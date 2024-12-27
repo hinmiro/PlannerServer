@@ -1,6 +1,7 @@
 package org.example.plannerserver.config;
 
 import org.example.plannerserver.repository.UserRepository;
+import org.example.plannerserver.service.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -15,9 +16,11 @@ import org.springframework.stereotype.Component;
 public class SecurityBeanInjector {
 
     private final UserRepository userRepository;
+    private final JwtService jwtService;
 
-    public SecurityBeanInjector(UserRepository userRepository) {
+    public SecurityBeanInjector(UserRepository userRepository, JwtService jwtService) {
         this.userRepository = userRepository;
+        this.jwtService = jwtService;
     }
 
 
@@ -27,10 +30,10 @@ public class SecurityBeanInjector {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder);
+        provider.setUserDetailsService(userDetailsService());
+        provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
 
@@ -42,5 +45,10 @@ public class SecurityBeanInjector {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByUsername(username).orElseThrow();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtService, userRepository);
     }
 }

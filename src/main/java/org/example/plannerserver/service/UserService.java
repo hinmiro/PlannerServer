@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
-    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
     private final UserRepository userRepository;
     private final ApplicationDataRepository appDataRepository;
@@ -27,7 +27,7 @@ public class UserService {
 
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
-        return users.stream().map(user -> convertToDTO(user)).collect(Collectors.toList());
+        return users.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     public UserDTO convertToDTO(User user) {
