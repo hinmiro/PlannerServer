@@ -44,17 +44,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String jwt = authenticationHeader.split(" ")[1];
-        String username;
+        String userId;
         try {
-            username = jwtService.extractUsername(jwt);
+            userId = jwtService.extractUserId(jwt);
         } catch (Exception e) {
             log.info("Corrupted jwt token found");
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Corrupted JWT token");
             return;
         }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            User user = userRepository.findByUsername(username).orElseThrow();
+        if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            User user = userRepository.findById(Long.parseLong(userId)).orElseThrow();
+
             if (jwtService.isValid(jwt, user)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

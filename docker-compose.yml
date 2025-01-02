@@ -9,7 +9,6 @@ services:
       - DB_URL=jdbc:postgresql://db:5432/postgres
       - DB_USER=postgres
       - DB_PASSWORD=postgres
-      - SECRET_KEY=supersecretsupersecretsupersecretsupersecretsupersecretsupersecretsupersecretsupersecret
     depends_on:
       - db
 

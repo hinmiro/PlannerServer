@@ -1,5 +1,7 @@
 package org.example.plannerserver.service;
 
+import lombok.extern.slf4j.Slf4j;
+import org.example.plannerserver.dto.UpdateUserDTO;
 import org.example.plannerserver.dto.UserDTO;
 import org.example.plannerserver.entity.User;
 import org.example.plannerserver.repository.ApplicationDataRepository;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UserService {
 
@@ -28,6 +31,28 @@ public class UserService {
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    public UserDTO updateUser(UpdateUserDTO updateUserDTO, UserDTO currentUser) {
+
+        if (updateUserDTO.getUsername() != null && !updateUserDTO.getUsername().equals(currentUser.getUsername()) && !updateUserDTO.getUsername().isEmpty()) {
+            currentUser.setUsername(updateUserDTO.getUsername());
+        }
+
+        if (updateUserDTO.getPassword() != null) {
+            currentUser.setPassword(encoder.encode(updateUserDTO.getPassword()));
+        }
+
+        if (updateUserDTO.getEmail() != null && !updateUserDTO.getEmail().isEmpty() && !updateUserDTO.getEmail().equals(currentUser.getEmail())) {
+            currentUser.setEmail(updateUserDTO.getEmail());
+        }
+
+        User user = convertToEntity(currentUser);
+        user.setUserId(currentUser.getUserId());
+        user = userRepository.save(user);
+        UserDTO userDTO = convertToDTO(user);
+        userDTO.setJwt(currentUser.getJwt());
+        return userDTO;
     }
 
     public UserDTO convertToDTO(User user) {

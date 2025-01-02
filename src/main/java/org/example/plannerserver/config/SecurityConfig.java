@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(HttpMethod.POST, "/auth/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/users").authenticated();
+                    auth.requestMatchers(HttpMethod.PUT, "/api/users/update").authenticated();
                 });
         return http.build();
     }
