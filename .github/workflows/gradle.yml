@@ -1,11 +1,10 @@
 name: Java CI with Gradle
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
-
+  workflow_run:
+    workflows: [ "Super-Linter" ]
+    types:
+      - completed
 jobs:
   build:
 
@@ -35,6 +34,25 @@ jobs:
 
       - name: Run Tests
         run: ./gradlew test
+
+      - name: SonarCloud Scan
+        env:
+          SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
+        run: ./gradlew sonarqube -Dsonar.projectKey=hinmiro_PlannerServer -Dsonar.organization=Miro Hintikka -Dsonar.host.url=https://sonarcloud.io
+
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const { context } = require('@actions/github');
+            const issueTitle = `Test failed on push to ${context.ref}`;
+            const issueBody = `A test failed on push to ${context.ref}. Please check the workflow logs for details.`;
+            await github.issues.create({
+              ...context.repo,
+              title: issueTitle,
+              body: issueBody,
+            });
 
 
   dependency-submission:
