@@ -3,19 +3,18 @@ plugins {
     id 'org.springframework.boot' version '3.4.0'
     id 'io.spring.dependency-management' version '1.1.6'
     id 'jacoco'
-    id 'org.sonarqube' version '4.0.0.2929'
+    id "org.sonarqube" version "6.0.1.5171"
 }
 
 group = 'org.example'
 version = 'Version 1.0'
 
 
-sonarqube {
+sonar {
     properties {
         property "sonar.projectKey", "hinmiro_PlannerServer"
         property "sonar.organization", "hinmiro"
         property "sonar.host.url", "https://sonarcloud.io"
-        property "sonar.login", System.getenv("SONAR_TOKEN")
     }
 }
 
