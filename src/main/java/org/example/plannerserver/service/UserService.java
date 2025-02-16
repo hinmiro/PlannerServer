@@ -11,7 +11,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -20,17 +19,15 @@ public class UserService {
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
     private final UserRepository userRepository;
-    private final ApplicationDataRepository appDataRepository;
 
     @Autowired
     public UserService(UserRepository userRepository, ApplicationDataRepository appDataRepository) {
         this.userRepository = userRepository;
-        this.appDataRepository = appDataRepository;
     }
 
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
-        return users.stream().map(this::convertToDTO).collect(Collectors.toList());
+        return users.stream().map(this::convertToDTO).toList();
     }
 
     public UserDTO updateUser(UpdateUserDTO updateUserDTO, UserDTO currentUser) {

@@ -6,7 +6,6 @@ import org.example.plannerserver.dto.UserDTO;
 import org.example.plannerserver.service.UserContextService;
 import org.example.plannerserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
