@@ -1,5 +1,6 @@
 package org.example.plannerserver.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
@@ -30,6 +31,7 @@ public class User implements UserDetails, Serializable {
     //    CONNECTION TO app_data TABLE
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "appdata_id", referencedColumnName = "data_id")
+    @JsonManagedReference
     private ApplicationData applicationData;
 
     public User(String username, String password, String email) {

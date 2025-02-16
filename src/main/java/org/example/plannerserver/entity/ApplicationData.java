@@ -1,5 +1,6 @@
 package org.example.plannerserver.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class ApplicationData implements Serializable {
     private Long dataId;
 
     @OneToOne(mappedBy = "applicationData")
+    @JsonBackReference
     private User user;
 
     public ApplicationData(User user) {
